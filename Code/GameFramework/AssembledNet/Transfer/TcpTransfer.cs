@@ -1,30 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace AssembledNet
 {
-    [StructLayout(LayoutKind.Explicit)]
-    public struct DataPackage
-    {
-        [FieldOffset(0)]
-        public Int32 length;
-        [FieldOffset(0)][MarshalAs(UnmanagedType.ByValArray,SizeConst = 4)]
-        public byte[] package;
-        [FieldOffset(4)][MarshalAs(UnmanagedType.ByValArray)]
-        public byte[] data;
-        public DataPackage(int len)
-        {
-            data = new byte[4 + len];
-            package = new byte[4];
-            length = len;
-        }
-    }
-
-    public class TcpTransfer
+    public class TcpTransfer : ITransfer
     {
         const int HEAD_LEN = 4;
 
@@ -48,13 +28,13 @@ namespace AssembledNet
             }
         }
 
-        private void Send(Socket socket, byte[] data)
+        public void Send(Socket socket, byte[] data)
         {
             Int32 length = (Int32)data.Length;
             //消息，前4位为表示消息长度的消息头
             byte[] buffer = new byte[length + HEAD_LEN];
             //big endian 消息头
-            buffer.SetBigEndian(length);
+            SetBigEndian(buffer, length);
             Buffer.BlockCopy(data, 0, buffer, HEAD_LEN, length);
             int bufferLength = buffer.Length;
             int sendedLength = 0;
@@ -62,6 +42,49 @@ namespace AssembledNet
             {
                 sendedLength += socket.Send(buffer, sendedLength, bufferLength - sendedLength, SocketFlags.None);
             } while (bufferLength - sendedLength > 0);
+        }
+
+        public Exception ReceiveThread(Socket socket, Queue<byte[]> receiveQueue)
+        {
+            if (socket==null)
+            {
+                return new ArgumentNullException("Socket is Null.");
+            }
+            while (true)
+            {
+                try
+                {
+                    if (socket.Poll(5, SelectMode.SelectRead) && socket.Available > 4)
+                    {
+                        int packetLength;
+                        byte[] head = new byte[4];
+                        socket.Receive(head, 4, SocketFlags.None);
+                        packetLength = GetBigEndian(head);
+                        byte[] packet = new byte[packetLength];
+                        int receivedLength = 0;
+                        do
+                        {
+                            if (socket.Poll(5, SelectMode.SelectRead) && socket.Available > 0)
+                            {
+                                int rev = socket.Receive(packet, receivedLength, packetLength - receivedLength, SocketFlags.None);
+                                if (rev <= 0)
+                                {
+                                    break;
+                                }
+                                receivedLength += rev;
+                            }
+                        } while (receivedLength != packetLength);
+                        lock (receiveQueue)
+                        {
+                            receiveQueue.Enqueue(packet);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    return e;
+                }
+            }
         }
     }
 }

@@ -34,9 +34,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interface\ILogger.cs" />
-    <Compile Include="Interface\ITransfer.cs" />
+    <Compile Include="Interface\ISocketTransfer.cs" />
     <Compile Include="Server\TcpServer.cs" />
     <Compile Include="Socket\SocketThread.cs" />
+    <Compile Include="Thread\TransferThread.cs" />
+    <Compile Include="Interface\ITransfer.cs" />
     <Compile Include="Transfer\TcpTransfer.cs" />
     <Compile Include="Utility\IntSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

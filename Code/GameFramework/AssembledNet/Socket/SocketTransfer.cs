@@ -7,7 +7,7 @@ namespace AssembledNet
     /// <summary>
     /// 异步接收
     /// </summary>
-    public class SocketTransfer : ITransfer
+    public class SocketTransfer : ISocketTransfer
     {
         private readonly Queue<byte[]> _sendQueue = new Queue<byte[]>();
         private readonly Queue<byte[]> _receiveQueue = new Queue<byte[]>();

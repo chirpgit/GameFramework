@@ -1,10 +1,12 @@
-﻿namespace AssembledNet
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
+
+namespace AssembledNet
 {
     public interface ITransfer
     {
-        void AddToSend(byte[] data);
-        bool TryGetReceivedData(out byte[] data);
-        SocketTransfer.TransferResult TryReceive();
-        SocketTransfer.TransferResult TrySend();
+        Exception ReceiveThread(Socket socket, Queue<byte[]> receiveQueue);
+        void Send(Socket socket, byte[] data);
     }
 }

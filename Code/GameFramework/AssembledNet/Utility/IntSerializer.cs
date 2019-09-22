@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AssembledNet
 {
-    public static class IntSerializer
+    internal static class Utility
     {
 
         public static void SetBigEndian(this byte[] data, Int32 lenght)

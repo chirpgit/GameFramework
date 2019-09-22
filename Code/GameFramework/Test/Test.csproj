@@ -56,6 +56,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssembledNet\AssembledNet.csproj">
+      <Project>{84c26f48-09db-4b4a-a644-4cde5ef32da3}</Project>
+      <Name>AssembledNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameFramework\GameFramework.csproj">
       <Project>{f0c34367-1236-4280-8a61-8b8b5d83015a}</Project>
       <Name>GameFramework</Name>
